@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO WEB3</title>
+   <script>
+       const abi = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_content",
+				"type": "string"
+			}
+		],
+		"name": "createTask",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "completed",
+				"type": "bool"
+			}
+		],
+		"name": "TaskCompleted",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "toggleCompleted",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "taskCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "tasks",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "content",
+				"type": "string"
+			},
+			{
+				"internalType": "bool",
+				"name": "completed",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+       const address = "0xE0E8ADC31F676c48bd34464FfEF01e9Dd02691ae";
+   </script>
+    <script src="https://unpkg.com/web3@1.7.3/dist/web3.min.js"></script>
+    <script>
+            let account;
+       async function loadWeb3(){
+            if(window.ethereum){
+                window.web3 = new Web3(window.ethereum)
+                await window.ethereum.enable()
+            }
+            else if(window.web3){
+                window.web3 = new Web3(window.web3.currentProvider)
+            }
+            else{
+                window.alert("Non-Ethereum browser detected");
+            }
+            let account = await web3.eth.getAccounts();
+            account = account[0];
+            // console.log(account)
+        }
+        loadWeb3();
+
+        async function listTasks(){
+            // Call all the task and display it.
+            var todo = new web3.eth.Contract(abi,address);
+            let total = await todo.methods.taskCount().call();
+
+            // console.log(total);
+
+            let data = [];
+
+            for(let i=1;i<=total;i++){
+                let now = await todo.methods.tasks(i).call();
+                 data.push(now);
+            }
+            // console.log(data)    
+            // console.log(data[0].content)
+            // var list = document.createElement("div");
+
+            var list = document.getElementById("views");
+
+            while(list.firstChild){
+                list.removeChild(list.firstChild);
+            }
+
+            for(let i=0;i<data.length;i++){
+
+                var ele = document.createElement("input");
+                ele.type = "checkbox";
+                ele.id = data[i].id;
+                ele.onclick = ()=>{toggle(data[i].id)};
+               
+                if(data[i].completed){
+                    ele.checked = true;
+                }
+                else{
+                    ele.checked = false;
+                }
+
+                //  console.log(ele)
+
+                var ele2 = document.createElement("h3");
+                ele2.innerHTML = `${data[i].content}`;
+                var tk = document.createElement("div");
+                tk.style.border = "2px solid red";
+                tk.style.margin = "20px"
+                tk.style.display = "flexbox";
+                tk.style.width = "400px"
+                tk.appendChild(ele);
+                tk.appendChild(ele2); 
+
+                list.appendChild(tk);
+            }
+           
+        }
+
+        async function toggle(id){
+            //Toggle the input checkbox and call the list Task.
+            // console.log(id);
+            var todo = new web3.eth.Contract(abi,address);
+            await todo.methods.toggleCompleted(id).send({from:"0x28EF677964957Ab0a929deDdf1bbf894BAeDE6D5"},(err,tx)=>{if(err)listTasks();});
+            listTasks();
+        }
+
+        async function go(){
+            // Submit the new task and then call the listTasks();
+            console.log("inside go ")
+          
+            var todo = new web3.eth.Contract(abi,address);
+            var age = document.getElementById("see").value;
+
+            await todo.methods.createTask(age).send({from:"0x28EF677964957Ab0a929deDdf1bbf894BAeDE6D5"});
+ 
+            document.getElementById(see).value = "";
+            listTasks();
+        }
+        listTasks();
+    </script>
+</head>
+<body>
+    
+         ADD TASK:-
+        <input type="text"  id="see"><br>
+        <button onclick="go()">SUBMIT</button>
+    
+    
+        <div id="views"></div>
+        <!-- <script>listTasks()</script> -->
+</body>
+</html>
