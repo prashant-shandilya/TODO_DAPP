@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TODO WEB3</title>
-   <script>
+   <script>//changable
        const abi = [
 	{
 		"inputs": [
@@ -100,7 +100,7 @@
 		"type": "function"
 	}
 ];
-       const address = "0xE0E8ADC31F676c48bd34464FfEF01e9Dd02691ae";
+       const address = "0xE0E8ADC31F676c48bd34464FfEF01e9Dd02691ae";//changable
    </script>
     <script src="https://unpkg.com/web3@1.7.3/dist/web3.min.js"></script>
     <script>
@@ -180,7 +180,7 @@
             //Toggle the input checkbox and call the list Task.
             // console.log(id);
             var todo = new web3.eth.Contract(abi,address);
-            await todo.methods.toggleCompleted(id).send({from:"0x28EF677964957Ab0a929deDdf1bbf894BAeDE6D5"},(err,tx)=>{if(err)listTasks();});
+            await todo.methods.toggleCompleted(id).send({from:account},(err,tx)=>{if(err)listTasks();});
             listTasks();
         }
 
@@ -191,9 +191,9 @@
             var todo = new web3.eth.Contract(abi,address);
             var age = document.getElementById("see").value;
 
-            await todo.methods.createTask(age).send({from:"0x28EF677964957Ab0a929deDdf1bbf894BAeDE6D5"});
+            await todo.methods.createTask(age).send({from:account});
  
-            document.getElementById(see).value = "";
+            document.getElementById("see").value = "";
             listTasks();
         }
         listTasks();
